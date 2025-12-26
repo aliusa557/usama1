@@ -1,94 +1,378 @@
-// script.js
+// Admin Credentials (stored in memory)
+const ADMIN_EMAIL = "rayusamajaat@gmail.com";
+const ADMIN_PASSWORD = "DiaUsa786?";
+let isLoggedIn = false;
+let editMode = false;
 
-// Function to open WhatsApp when clicking the "Let's Chat" button
-function openWhatsApp() {
-  // Replace "phone_number" with the actual phone number you want to open in WhatsApp.
-  // Remember to include the country code without '+' or '0', e.g., "923001234567".
-  const phoneNumber = "phone_number";
+// Content storage object
+let contentData = {};
 
-  // Construct the WhatsApp URL
-  const whatsappURL = `https://api.whatsapp.com/send?phone=${923257316315}&text=Hello! I'd like to chat.`;
-
-  // Open the WhatsApp URL in a new tab
-  window.open(whatsappURL, "_blank");
-}
-
-// Function to send an email when clicking the "Let's Chat" button
-function sendEmail() {
-  // Replace "your_email_address" with your email address.
-  const emailAddress = "rayusamajaat@gmail.com";
-
-  // Replace "Chat Request" with the subject of the email.
-  const emailSubject = "Chat Request";
-
-  // Replace "Hello! I'd like to chat." with the email message.
-  const emailMessage = "Hello! I'd like to chat.";
-
-  // Construct the email URL
-  const emailURL = `mailto:${emailAddress}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailMessage)}`;
-
-  // Open the email URL
-  window.location.href = emailURL;
-}
-
-// Function to handle the CV download
-function downloadCV() {
-  // Replace "cv_file_path.pdf" with the actual path to your CV file.
-  // You can use a direct link to the file or use a relative path to the file from the HTML file location.
-  const cvFilePath = "https://github.com/aliusa557/usama/raw/main/CV.UsamaMehboob.pdf";
-
-  // Create an anchor element to trigger the download
-  const anchor = document.createElement("a");
-  anchor.href = cvFilePath;
-  anchor.download = "CV.UsamaMehboob.pdf"; // Change the name of the downloaded CV file
-  anchor.click();
-}
-
-
-
-// Function to handle the "Hire Me" button click
-function handleHireMe() {
-  // Replace "your_email_address" with your email address.
-  const emailAddress = "rayusamajaat@gmail";
-
-  // Replace "Hiring Request" with the subject of the email.
-  const emailSubject = "Hiring Request";
-
-  // Replace "Hello! I'd like to hire you." with the email message.
-  const emailMessage = "Hello! I'd like to hire you.";
-
-  // Construct the email URL
-  const emailURL = `mailto:${emailAddress}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailMessage)}`;
-
-  // Open the email URL
-  window.location.href = emailURL;
-}
-
-// Add event listeners to the buttons
-document.addEventListener("DOMContentLoaded", function () {
-  const letsChatButton = document.querySelector(".contact .button button");
-  const downloadCVButton = document.querySelector(".about .button button");
-  const hireMeButton = document.querySelector(".home .button button");
-
-  if (letsChatButton) {
-    letsChatButton.addEventListener("click", function () {
-      // Prompt the user to choose between WhatsApp and Email
-      const chatMethod = prompt("Choose a chat method: 1. WhatsApp 2. Email");
-      if (chatMethod === "1") {
-        openWhatsApp();
-      } else if (chatMethod === "2") {
-        sendEmail();
-      } else {
-        alert("Invalid choice. Please choose either 1 or 2.");
-      }
-    });
-  }
-
-  if (downloadCVButton) {
-    downloadCVButton.addEventListener("click", downloadCV);
-  }
-
-  if (hireMeButton) {
-    hireMeButton.addEventListener("click", handleHireMe);
-  }
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", function() {
+    createParticles();
+    initScrollEffects();
+    loadStoredContent();
+    
+    // Typing animation
+    typeWriter();
 });
+
+// Create floating particles
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    const particleCount = 50;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particlesContainer.appendChild(particle);
+    }
+}
+
+// Scroll effects
+function initScrollEffects() {
+    const navbar = document.getElementById('navbar');
+    const scrollTop = document.querySelector('.scroll-top');
+    
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 100) {
+            navbar.classList.add('scrolled');
+            scrollTop.style.display = 'block';
+        } else {
+            navbar.classList.remove('scrolled');
+            scrollTop.style.display = 'none';
+        }
+        
+        // Animate skill bars on scroll
+        animateSkillBars();
+    });
+}
+
+// Animate skill progress bars
+function animateSkillBars() {
+    const skillCards = document.querySelectorAll('.skill-card');
+    
+    skillCards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 100) {
+            const progressBar = card.querySelector('.skill-progress-bar');
+            if (progressBar && !progressBar.classList.contains('animated')) {
+                progressBar.classList.add('animated');
+            }
+        }
+    });
+}
+
+// Typing animation effect
+let typingText = "Full Stack .NET Developer";
+let typingIndex = 0;
+let typingElement;
+
+function typeWriter() {
+    typingElement = document.querySelector('.typing-animation');
+    if (!typingElement) return;
+    
+    const originalText = typingElement.textContent;
+    typingText = originalText;
+    typingElement.textContent = '';
+    
+    function type() {
+        if (typingIndex < typingText.length) {
+            typingElement.textContent += typingText.charAt(typingIndex);
+            typingIndex++;
+            setTimeout(type, 100);
+        } else {
+            setTimeout(() => {
+                typingIndex = 0;
+                typingElement.textContent = '';
+                type();
+            }, 3000);
+        }
+    }
+    
+    type();
+}
+
+// Toggle mobile menu
+function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('active');
+}
+
+// Login Modal Functions
+function openLoginModal() {
+    document.getElementById('loginModal').classList.add('active');
+}
+
+function closeLoginModal() {
+    document.getElementById('loginModal').classList.remove('active');
+    document.getElementById('errorMessage').textContent = '';
+}
+
+// Handle login
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('errorMessage');
+    
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        closeLoginModal();
+        showAdminPanel();
+        showSuccessMessage('Login successful! You can now edit content.');
+    } else {
+        errorMessage.textContent = 'Invalid email or password!';
+    }
+}
+
+// Show admin panel
+function showAdminPanel() {
+    const adminPanel = document.getElementById('adminPanel');
+    const loginBtn = document.querySelector('.login-btn');
+    
+    adminPanel.classList.add('active');
+    loginBtn.innerHTML = '<i class="fas fa-user-check"></i> Admin';
+    loginBtn.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+}
+
+// Logout
+function logout() {
+    isLoggedIn = false;
+    editMode = false;
+    
+    const adminPanel = document.getElementById('adminPanel');
+    const loginBtn = document.querySelector('.login-btn');
+    
+    adminPanel.classList.remove('active');
+    loginBtn.innerHTML = '<i class="fas fa-user"></i> Login';
+    loginBtn.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+    
+    // Disable editing
+    disableEdit();
+    showSuccessMessage('Logged out successfully!');
+}
+
+// Enable edit mode
+function enableEdit() {
+    if (!isLoggedIn) {
+        alert('Please login first!');
+        return;
+    }
+    
+    editMode = true;
+    const editableElements = document.querySelectorAll('[data-field]');
+    
+    editableElements.forEach(element => {
+        element.contentEditable = true;
+        element.style.outline = '2px dashed #667eea';
+    });
+    
+    document.querySelector('.edit-btn').style.display = 'none';
+    document.querySelector('.save-btn').style.display = 'block';
+    
+    showSuccessMessage('Edit mode enabled! Click on any text to edit.');
+}
+
+// Disable edit mode
+function disableEdit() {
+    editMode = false;
+    const editableElements = document.querySelectorAll('[data-field]');
+    
+    editableElements.forEach(element => {
+        element.contentEditable = false;
+        element.style.outline = 'none';
+    });
+    
+    if (isLoggedIn) {
+        document.querySelector('.edit-btn').style.display = 'block';
+        document.querySelector('.save-btn').style.display = 'none';
+    }
+}
+
+// Save changes
+function saveChanges() {
+    const editableElements = document.querySelectorAll('[data-field]');
+    
+    editableElements.forEach(element => {
+        const fieldName = element.getAttribute('data-field');
+        contentData[fieldName] = element.textContent || element.innerHTML;
+    });
+    
+    // Store in localStorage
+    localStorage.setItem('portfolioContent', JSON.stringify(contentData));
+    
+    disableEdit();
+    showSuccessMessage('Changes saved successfully!');
+}
+
+// Load stored content
+function loadStoredContent() {
+    const stored = localStorage.getItem('portfolioContent');
+    if (stored) {
+        contentData = JSON.parse(stored);
+        
+        Object.keys(contentData).forEach(fieldName => {
+            const element = document.querySelector(`[data-field="${fieldName}"]`);
+            if (element) {
+                element.textContent = contentData[fieldName];
+            }
+        });
+    }
+}
+
+// Show success message
+function showSuccessMessage(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Hire Me Action
+function hireMeAction() {
+    const email = "rayusamajaat@gmail.com";
+    const subject = "Hiring Request";
+    const body = "Hello Usama,%0D%0A%0D%0AI would like to hire you for a project.%0D%0A%0D%0ABest regards";
+    
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+// Download CV
+function downloadCV() {
+    const cvUrl = "https://github.com/aliusa557/usama/raw/main/CV.UsamaMehboob.pdf";
+    
+    const link = document.createElement('a');
+    link.href = cvUrl;
+    link.download = "CV.UsamaMehboob.pdf";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Let's Chat Action
+function letsChatAction() {
+    const choice = confirm("Click OK for WhatsApp or Cancel for Email");
+    
+    if (choice) {
+        // WhatsApp
+        const whatsappNumber = "923184206938";
+        const message = "Hello! I'd like to chat about a project.";
+        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    } else {
+        // Email
+        const email = "rayusamajaat@gmail.com";
+        const subject = "Chat Request";
+        const body = "Hello Usama,%0D%0A%0D%0AI'd like to discuss a project with you.%0D%0A%0D%0ABest regards";
+        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    }
+}
+
+// Close modal on outside click
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('loginModal');
+    if (event.target === modal) {
+        closeLoginModal();
+    }
+});
+
+// Smooth scroll for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            // Close mobile menu if open
+            const menu = document.getElementById('menu');
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        }
+    });
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    }
+`;
+document.head.appendChild(style);
+// Update current year and date/time in footer
+function updateDateTime() {
+    const now = new Date();
+    
+    // Update year
+    const yearElement = document.getElementById('currentYear');
+    if (yearElement) {
+        yearElement.textContent = now.getFullYear();
+    }
+    
+    // Update date and time
+    const dateTimeElement = document.getElementById('currentDateTime');
+    if (dateTimeElement) {
+        const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+        dateTimeElement.textContent = now.toLocaleString('en-US', options);
+    }
+}
+
+// Call on page load
+updateDateTime();
+
+// Update every second
+setInterval(updateDateTime, 1000);

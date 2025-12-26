@@ -1,188 +1,283 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
-    <title>Usama Mehboob</title>
-    <link rel="stylesheet" href="style1.css" />
-	<script src = "myscript.js"></script>
-	  <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
-    <!-- Move to up button -->
-    <div class="scroll-button">
-      <a href="#home"><i class="fas fa-arrow-up"></i></a>
+    <title>Usama Mehboob - Full Stack .NET Developer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style1.css" />
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+
+    <!-- Floating Particles -->
+    <div id="particles"></div>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top">
+        <a href="#home"><i class="fas fa-arrow-up"></i></a>
     </div>
-    <!-- navgaition menu -->
-    <nav>
-      <div class="navbar">
-        <div class="logo"><a href="#">Portfolio.</a></div>
-        <ul class="menu">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#skills">Skills</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <div class="cancel-btn">
-            <i class="fas fa-times"></i>
-          </div>
-        </ul>
-        <div class="media-icons">
-          <a href="https://web.facebook.com/usama.jaat.773"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://twitter.com/RayUsamaJaat1"><i class="fab fa-twitter"></i></a>
-          <a href="https://www.instagram.com/ray_usama_jaat/?igshid=NGExMmI2YTkyZg%3D%3D"><i class="fab fa-instagram"></i></a>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="navbar">
+            <div class="logo">
+                <a href="#home"><i class="fas fa-code"></i> Portfolio</a>
+            </div>
+            <ul class="menu" id="menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+    <a href="https://www.linkedin.com/in/rayusamajaat" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+    <button class="login-btn" onclick="openLoginModal()">
+        <i class="fas fa-user"></i> Login
+    </button>
+</div>
+            <div class="menu-btn" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
-      </div>
-      <div class="menu-btn">
-        <i class="fas fa-bars"></i>
-      </div>
     </nav>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h3><i class="fas fa-user-shield"></i> Admin Panel</h3>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        <button class="edit-btn" onclick="enableEdit()">
+            <i class="fas fa-edit"></i> Edit Mode
+        </button>
+        <button class="save-btn" onclick="saveChanges()" style="display: none;">
+            <i class="fas fa-save"></i> Save Changes
+        </button>
+    </div>
+
+    <!-- Home Section -->
     <section class="home" id="home">
-      <div class="home-content">
-        <div class="text">
-          <div class="text-one">Salaam,</div>
-          <div class="text-two">I'm Usama Mehboob</div>
-          <div class="text-three">Flutter Developer</div>
-          <div class="text-four">From Pakistan</div>
+        <div class="home-content">
+            <div class="text-content">
+                <div class="text-one">Hello, I'm</div>
+                <div class="text-two" contenteditable="false" data-field="name">Usama Mehboob</div>
+                <div class="text-three typing-animation" contenteditable="false" data-field="title">Full Stack .NET Developer</div>
+                <div class="text-four" contenteditable="false" data-field="location">From Pakistan</div>
+                <p contenteditable="false" data-field="intro">
+                    Specialized in ASP.NET Core, C#, JavaScript, jQuery, and AJAX. 
+                    Building scalable web applications with modern technologies.
+                </p>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="hireMeAction()">
+                        <i class="fas fa-briefcase"></i> Hire Me
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadCV()">
+                        <i class="fas fa-download"></i> Download CV
+                    </button>
+                </div>
+            </div>
+            <div class="profile-image">
+                <img src="bg1.png" alt="Usama Mehboob" id="profileImg">
+            </div>
         </div>
-        <div class="button">
-          <button>Hire Me</button>
-        </div>
-      </div>
     </section>
+
+    <!-- About Section -->
     <section class="about" id="about">
-      <div class="content">
-        <div class="title"><span>About Me</span></div>
-        <div class="about-details">
-          <div class="left">
-            <img src="bg1.png" alt="" />
-          </div>
-          <div class="right">
-            <div class="topic">Designing Is My Passion</div>
-            <p>
-              It is very important for the customer to pay attention to the adipiscing process. They abandon it, let the truth be born, it repels us the pleasure itself; Let the comfort of the accusers seek to be tempered by the labor of the pains; let them please themselves, for when you see them, the truth will be followed by the debts of the truth, who is greater than any of them! Here's the problem with that option
-              By right of them, should our lot seek to do what I should open the pardon of the elders of these just, or by that inventor of the pleasures of the pleasures which hinders the pleasures of the error of life, of all the present? There is no opening, they do not know the flight of carrying the matter to others and, at times, the distinction of fault from which we lead from the free of labor. Let it be easy for those who are present, and let the pleasures be especially to the righteous.
-            </p>
-            <div class="button">
-              <button>Download CV</button>
+        <div class="content-wrapper">
+            <div class="section-title">
+                <h2>About Me</h2>
             </div>
-          </div>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="Profiletwo.JPG" alt="About">
+                </div>
+                <div class="about-text">
+                    <h3 contenteditable="false" data-field="about-title">Development Is My Passion</h3>
+                    <p contenteditable="false" data-field="about-desc1">
+                        I'm a Full Stack .NET Developer with 2+ years of experience in building robust web applications. 
+                        My expertise includes ASP.NET Core, C#, JavaScript, jQuery, AJAX, and modern web technologies.
+                    </p>
+                    <p contenteditable="false" data-field="about-desc2">
+                        I specialize in creating scalable, efficient, and user-friendly applications that solve real-world problems. 
+                        My approach combines clean code practices with innovative solutions to deliver exceptional results.
+                    </p>
+                    <div class="experience-box">
+                        <div class="exp-number" contenteditable="false" data-field="experience">2+</div>
+                        <div class="exp-text">Years Of<br/>Experience</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </section>
 
-    <!-- My Skill Section Start -->
-    <!-- Section Tag and Other Div will same where we need to put same CSS -->
+    <!-- Skills Section -->
     <section class="skills" id="skills">
-      <div class="content">
-        <div class="title"><span>My Skills</span></div>
-        <div class="skills-details">
-          <div class="text">
-            <div class="topic">Skills Reflects Our Knowledge</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. Less born held times? As it were, the thing that every Furthermore, he rejects the matter by rejecting it as the smallest of the present to whom, the duties! He is free, and the distinction repels him, but they do not know how to please him. What troubles, otherwise?</p>
-            <div class="experience">
-              <div class="num">2</div>
-              <div class="exp">
-                Years Of <br />
-                Experience
-              </div>
+        <div class="content-wrapper">
+            <div class="section-title">
+                <h2>My Skills</h2>
             </div>
-          </div>
-          <div class="boxes">
-            <div class="box">
-              <div class="topic">HTML</div>
-              <div class="per">90%</div>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <i class="fab fa-microsoft"></i>
+                    <h3>ASP.NET Core</h3>
+                    <p>Building enterprise-level applications</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 90%"></div>
+                    </div>
+                    <span class="skill-percent">90%</span>
+                </div>
+                <div class="skill-card">
+                    <i class="fab fa-cuttlefish"></i>
+                    <h3>C#</h3>
+                    <p>Object-oriented programming expert</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 90%"></div>
+                    </div>
+                    <span class="skill-percent">90%</span>
+                </div>
+                <div class="skill-card">
+                    <i class="fab fa-js"></i>
+                    <h3>JavaScript</h3>
+                    <p>Modern ES6+ and frameworks</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 85%"></div>
+                    </div>
+                    <span class="skill-percent">85%</span>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-code"></i>
+                    <h3>jQuery & AJAX</h3>
+                    <p>Dynamic web interactions</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 88%"></div>
+                    </div>
+                    <span class="skill-percent">88%</span>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-database"></i>
+                    <h3>SQL Server</h3>
+                    <p>Database design and optimization</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 85%"></div>
+                    </div>
+                    <span class="skill-percent">85%</span>
+                </div>
+                <div class="skill-card">
+                    <i class="fab fa-html5"></i>
+                    <h3>HTML5 & CSS3</h3>
+                    <p>Responsive and modern designs</p>
+                    <div class="skill-progress">
+                        <div class="skill-progress-bar" style="width: 92%"></div>
+                    </div>
+                    <span class="skill-percent">92%</span>
+                </div>
             </div>
-            <div class="box">
-              <div class="topic">CSS</div>
-              <div class="per">80%</div>
-            </div>
-            <div class="box">
-              <div class="topic">JavScript</div>
-              <div class="per">60%</div>
-            </div>
-            <div class="box">
-              <div class="topic">PHP</div>
-              <div class="per">40%</div>
-            </div>
-          </div>
         </div>
-      </div>
     </section>
 
-    <!-- My Services Section Start -->
+    <!-- Services Section -->
     <section class="services" id="services">
-      <div class="content">
-        <div class="title"><span>My Services</span></div>
-        <div class="boxes">
-          <div class="box">
-            <div class="icon">
-              <i class="fas fa-desktop"></i>
+        <div class="content-wrapper">
+            <div class="section-title">
+                <h2>My Services</h2>
             </div>
-            <div class="topic">Web Devlopment</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. But flexibility rather than hate, who chooses the pleasure?</p>
-          </div>
-          <div class="box">
-            <div class="icon">
-              <i class="fas fa-paint-brush"></i>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-laptop-code"></i></div>
+                    <h3>Web Development</h3>
+                    <p>Full-stack web applications using ASP.NET Core, C#, and modern JavaScript frameworks.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-server"></i></div>
+                    <h3>API Development</h3>
+                    <p>RESTful APIs and microservices architecture for scalable solutions.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-database"></i></div>
+                    <h3>Database Design</h3>
+                    <p>Efficient database schemas and query optimization for better performance.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>Responsive Design</h3>
+                    <p>Mobile-first, responsive web applications that work on all devices.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Security</h3>
+                    <p>Implementing secure authentication and authorization systems.</p>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-cogs"></i></div>
+                    <h3>Maintenance & Support</h3>
+                    <p>Ongoing support and maintenance for existing applications.</p>
+                </div>
             </div>
-            <div class="topic">Graphic Design</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. But flexibility rather than hate, who chooses the pleasure?</p>
-          </div>
-          <div class="box">
-            <div class="icon">
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="topic">Digital Marketing</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. But flexibility rather than hate, who chooses the pleasure?</p>
-          </div>
-          <div class="box">
-            <div class="icon">
-              <i class="fab fa-android"></i>
-            </div>
-            <div class="topic">Icon Design</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. But flexibility rather than hate, who chooses the pleasure?</p>
-          </div>
-          <div class="box">
-            <div class="icon">
-              <i class="fas fa-camera-retro"></i>
-            </div>
-            <div class="topic">Photography</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. But flexibility rather than hate, who chooses the pleasure?</p>
-          </div>
-          <div class="box">
-            <div class="icon">
-              <i class="fas fa-tablet-alt"></i>
-            </div>
-            <div class="topic">Apps Devlopment</div>
-            <p>It is very important for the customer to pay attention to the adipiscing process. But flexibility rather than hate, who chooses the pleasure?</p>
-          </div>
         </div>
-      </div>
     </section>
 
-    <!-- Contact Me section Start -->
+    <!-- Contact Section -->
     <section class="contact" id="contact">
-      <div class="content">
-        <div class="title"><span>Contact Me</span></div>
-        <div class="text">
-          <div class="topic">Have Any Project?</div>
-          <p>It is very important for the customer to pay attention to the adipiscing process. Neither she nor him the pains of the corrupt, to do that he is never scorned by the pleasure of enduring those who are only of means! Rejected abandons the consequences of choosing the pleasures of others that are repelled by us.</p>
-          <div class="button">
-            <button>Let's Chat</button>
-          </div>
+        <div class="content-wrapper">
+            <div class="section-title">
+                <h2>Contact Me</h2>
+            </div>
+            <div class="contact-content">
+                <h3>Have A Project?</h3>
+                <p>
+                    I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. 
+                    Feel free to reach out through any of the methods below.
+                </p>
+                <div class="contact-methods">
+                    <a href="mailto:rayusamajaat@gmail.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>rayusamajaat@gmail.com</span>
+                    </a>
+                    <a href="https://wa.me/923184206938" class="contact-item" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>+92 318 4206938</span>
+                    </a>
+                </div>
+                <button class="btn btn-primary" onclick="letsChatAction()">
+                    <i class="fas fa-comments"></i> Let's Chat
+                </button>
+            </div>
         </div>
-      </div>
     </section>
 
-    <!-- Footer Section Start -->
+    <!-- Footer -->
     <footer>
-      <div class="text">
-        <span>Created By <a href="#">Usama Mehboob</a> | &#169; 2023 All Rights Reserved</span>
-      </div>
-    </footer>
+    <p>Created By <a href="#">Usama Mehboob</a> | &copy; <span id="currentYear"></span> All Rights Reserved | <span id="currentDateTime"></span></p>
+</footer>
 
-    <script src="script.js"></script>
-  </body>
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-lock"></i> Admin Login</h2>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-user"></i> Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-key"></i> Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <div class="error-message" id="errorMessage"></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="myscript.js"></script>
+</body>
 </html>
