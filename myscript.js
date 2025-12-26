@@ -6,15 +6,19 @@ let editMode = false;
 
 // Content storage object
 let contentData = {};
+let projects = [];
+let currentEditProjectId = null;
+let cvFileData = null;
 
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", function() {
     createParticles();
     initScrollEffects();
     loadStoredContent();
-    
-    // Typing animation
+    loadProjects();
     typeWriter();
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
 });
 
 // Create floating particles
@@ -47,7 +51,6 @@ function initScrollEffects() {
             scrollTop.style.display = 'none';
         }
         
-        // Animate skill bars on scroll
         animateSkillBars();
     });
 }
@@ -97,6 +100,30 @@ function typeWriter() {
     type();
 }
 
+// Update date and time
+function updateDateTime() {
+    const now = new Date();
+    
+    const yearElement = document.getElementById('currentYear');
+    if (yearElement) {
+        yearElement.textContent = now.getFullYear();
+    }
+    
+    const dateTimeElement = document.getElementById('currentDateTime');
+    if (dateTimeElement) {
+        const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+        dateTimeElement.textContent = now.toLocaleString('en-US', options);
+    }
+}
+
 // Toggle mobile menu
 function toggleMenu() {
     const menu = document.getElementById('menu');
@@ -135,10 +162,15 @@ function handleLogin(event) {
 function showAdminPanel() {
     const adminPanel = document.getElementById('adminPanel');
     const loginBtn = document.querySelector('.login-btn');
+    const addProjectBtn = document.getElementById('addProjectBtn');
     
     adminPanel.classList.add('active');
     loginBtn.innerHTML = '<i class="fas fa-user-check"></i> Admin';
     loginBtn.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+    
+    if (addProjectBtn) {
+        addProjectBtn.classList.add('show');
+    }
 }
 
 // Logout
@@ -148,12 +180,16 @@ function logout() {
     
     const adminPanel = document.getElementById('adminPanel');
     const loginBtn = document.querySelector('.login-btn');
+    const addProjectBtn = document.getElementById('addProjectBtn');
     
     adminPanel.classList.remove('active');
     loginBtn.innerHTML = '<i class="fas fa-user"></i> Login';
     loginBtn.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
     
-    // Disable editing
+    if (addProjectBtn) {
+        addProjectBtn.classList.remove('show');
+    }
+    
     disableEdit();
     showSuccessMessage('Logged out successfully!');
 }
@@ -173,10 +209,20 @@ function enableEdit() {
         element.style.outline = '2px dashed #667eea';
     });
     
+    // Show image upload buttons
+    document.getElementById('profileImageContainer').classList.add('edit-mode');
+    document.getElementById('aboutImageContainer').classList.add('edit-mode');
+    
+    // Show CV upload section
+    document.getElementById('cvUploadSection').classList.add('show');
+    
+    // Show project action buttons
+    document.querySelectorAll('.project-actions').forEach(el => el.style.display = 'flex');
+    
     document.querySelector('.edit-btn').style.display = 'none';
     document.querySelector('.save-btn').style.display = 'block';
     
-    showSuccessMessage('Edit mode enabled! Click on any text to edit.');
+    showSuccessMessage('Edit mode enabled! Click on any text to edit or upload images.');
 }
 
 // Disable edit mode
@@ -188,6 +234,16 @@ function disableEdit() {
         element.contentEditable = false;
         element.style.outline = 'none';
     });
+    
+    // Hide image upload buttons
+    document.getElementById('profileImageContainer').classList.remove('edit-mode');
+    document.getElementById('aboutImageContainer').classList.remove('edit-mode');
+    
+    // Hide CV upload section
+    document.getElementById('cvUploadSection').classList.remove('show');
+    
+    // Hide project action buttons
+    document.querySelectorAll('.project-actions').forEach(el => el.style.display = 'none');
     
     if (isLoggedIn) {
         document.querySelector('.edit-btn').style.display = 'block';
@@ -204,7 +260,10 @@ function saveChanges() {
         contentData[fieldName] = element.textContent || element.innerHTML;
     });
     
-    // Store in localStorage
+    // Store images
+    contentData.profileImage = document.getElementById('profileImg').src;
+    contentData.aboutImage = document.getElementById('aboutImg').src;
+    
     localStorage.setItem('portfolioContent', JSON.stringify(contentData));
     
     disableEdit();
@@ -223,6 +282,229 @@ function loadStoredContent() {
                 element.textContent = contentData[fieldName];
             }
         });
+        
+        // Load images
+        if (contentData.profileImage) {
+            document.getElementById('profileImg').src = contentData.profileImage;
+        }
+        if (contentData.aboutImage) {
+            document.getElementById('aboutImg').src = contentData.aboutImage;
+        }
+    }
+}
+
+// Handle image upload
+function handleImageUpload(event, imgId) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById(imgId).src = e.target.result;
+            showSuccessMessage('Image uploaded! Click "Save Changes" to keep it.');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Handle CV file upload
+document.getElementById('cvFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            cvFileData = e.target.result;
+            localStorage.setItem('cvFile', cvFileData);
+            showSuccessMessage('CV uploaded successfully!');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        alert('Please upload a PDF file');
+    }
+});
+
+// Download CV
+function downloadCV() {
+    const storedCV = localStorage.getItem('cvFile');
+    
+    if (storedCV) {
+        // Download uploaded CV
+        const link = document.createElement('a');
+        link.href = storedCV;
+        link.download = "CV.UsamaMehboob.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        // Download default CV
+        const cvUrl = "https://github.com/aliusa557/usama1/raw/main/CV.UsamaMehboob.pdf";
+        const link = document.createElement('a');
+        link.href = cvUrl;
+        link.download = "CV.UsamaMehboob.pdf";
+        link.target = "_blank";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// PROJECT MANAGEMENT FUNCTIONS
+
+// Load projects from localStorage
+function loadProjects() {
+    const stored = localStorage.getItem('projects');
+    if (stored) {
+        projects = JSON.parse(stored);
+    } else {
+        // Default projects
+        projects = [
+            {
+                id: 1,
+                title: "E-Commerce Platform",
+                description: "Full-stack e-commerce solution built with ASP.NET Core and React",
+                link: "https://github.com",
+                image: "https://via.placeholder.com/400x250/667eea/ffffff?text=E-Commerce"
+            },
+            {
+                id: 2,
+                title: "Task Management System",
+                description: "Modern task management application with real-time updates",
+                link: "https://github.com",
+                image: "https://via.placeholder.com/400x250/764ba2/ffffff?text=Task+Manager"
+            }
+        ];
+        saveProjects();
+    }
+    renderProjects();
+}
+
+// Save projects to localStorage
+function saveProjects() {
+    localStorage.setItem('projects', JSON.stringify(projects));
+}
+
+// Render projects
+function renderProjects() {
+    const projectsGrid = document.getElementById('projectsGrid');
+    projectsGrid.innerHTML = '';
+    
+    projects.forEach(project => {
+        const projectCard = document.createElement('div');
+        projectCard.className = 'project-card';
+        projectCard.innerHTML = `
+            <img src="${project.image}" alt="${project.title}" class="project-image">
+            <div class="project-content">
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
+                <a href="${project.link}" target="_blank" class="project-link">
+                    <i class="fas fa-external-link-alt"></i> View Project
+                </a>
+                <div class="project-actions" style="display: ${editMode ? 'flex' : 'none'};">
+                    <button class="edit-project-btn" onclick="editProject(${project.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="delete-project-btn" onclick="deleteProject(${project.id})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        `;
+        projectsGrid.appendChild(projectCard);
+    });
+}
+
+// Open project modal
+function openProjectModal() {
+    if (!isLoggedIn) {
+        alert('Please login first!');
+        return;
+    }
+    
+    currentEditProjectId = null;
+    document.getElementById('projectModalTitle').textContent = 'Add Project';
+    document.getElementById('projectForm').reset();
+    document.getElementById('projectModal').classList.add('active');
+}
+
+// Close project modal
+function closeProjectModal() {
+    document.getElementById('projectModal').classList.remove('active');
+    document.getElementById('projectForm').reset();
+    currentEditProjectId = null;
+}
+
+// Handle project image upload
+function handleProjectImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('projectImage').value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Handle project form submit
+function handleProjectSubmit(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('projectTitle').value;
+    const description = document.getElementById('projectDescription').value;
+    const link = document.getElementById('projectLink').value;
+    const image = document.getElementById('projectImage').value || 'https://via.placeholder.com/400x250/667eea/ffffff?text=' + encodeURIComponent(title);
+    
+    if (currentEditProjectId) {
+        // Update existing project
+        const index = projects.findIndex(p => p.id === currentEditProjectId);
+        if (index !== -1) {
+            projects[index] = {
+                ...projects[index],
+                title,
+                description,
+                link,
+                image
+            };
+            showSuccessMessage('Project updated successfully!');
+        }
+    } else {
+        // Add new project
+        const newProject = {
+            id: Date.now(),
+            title,
+            description,
+            link,
+            image
+        };
+        projects.push(newProject);
+        showSuccessMessage('Project added successfully!');
+    }
+    
+    saveProjects();
+    renderProjects();
+    closeProjectModal();
+}
+
+// Edit project
+function editProject(id) {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+    
+    currentEditProjectId = id;
+    document.getElementById('projectModalTitle').textContent = 'Edit Project';
+    document.getElementById('projectTitle').value = project.title;
+    document.getElementById('projectDescription').value = project.description;
+    document.getElementById('projectLink').value = project.link;
+    document.getElementById('projectImage').value = project.image;
+    document.getElementById('projectModal').classList.add('active');
+}
+
+// Delete project
+function deleteProject(id) {
+    if (confirm('Are you sure you want to delete this project?')) {
+        projects = projects.filter(p => p.id !== id);
+        saveProjects();
+        renderProjects();
+        showSuccessMessage('Project deleted successfully!');
     }
 }
 
@@ -260,30 +542,15 @@ function hireMeAction() {
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
 }
 
-// Download CV
-function downloadCV() {
-    const cvUrl = "https://github.com/aliusa557/usama1/raw/main/CV.UsamaMehboob.pdf";
-    
-    const link = document.createElement('a');
-    link.href = cvUrl;
-    link.download = "CV.UsamaMehboob.pdf";
-    link.target = "_blank";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
 // Let's Chat Action
 function letsChatAction() {
     const choice = confirm("Click OK for WhatsApp or Cancel for Email");
     
     if (choice) {
-        // WhatsApp
         const whatsappNumber = "923184206938";
         const message = "Hello! I'd like to chat about a project.";
         window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
     } else {
-        // Email
         const email = "rayusamajaat@gmail.com";
         const subject = "Chat Request";
         const body = "Hello Usama,%0D%0A%0D%0AI'd like to discuss a project with you.%0D%0A%0D%0ABest regards";
@@ -293,9 +560,14 @@ function letsChatAction() {
 
 // Close modal on outside click
 window.addEventListener('click', function(event) {
-    const modal = document.getElementById('loginModal');
-    if (event.target === modal) {
+    const loginModal = document.getElementById('loginModal');
+    const projectModal = document.getElementById('projectModal');
+    
+    if (event.target === loginModal) {
         closeLoginModal();
+    }
+    if (event.target === projectModal) {
+        closeProjectModal();
     }
 });
 
@@ -310,7 +582,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 block: 'start'
             });
             
-            // Close mobile menu if open
             const menu = document.getElementById('menu');
             if (menu.classList.contains('active')) {
                 menu.classList.remove('active');
@@ -345,34 +616,3 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-// Update current year and date/time in footer
-function updateDateTime() {
-    const now = new Date();
-    
-    // Update year
-    const yearElement = document.getElementById('currentYear');
-    if (yearElement) {
-        yearElement.textContent = now.getFullYear();
-    }
-    
-    // Update date and time
-    const dateTimeElement = document.getElementById('currentDateTime');
-    if (dateTimeElement) {
-        const options = { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric',
-            hour: '2-digit', 
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-        dateTimeElement.textContent = now.toLocaleString('en-US', options);
-    }
-}
-
-// Call on page load
-updateDateTime();
-
-// Update every second
-setInterval(updateDateTime, 1000);

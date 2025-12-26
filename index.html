@@ -6,6 +6,269 @@
     <title>Usama Mehboob - Full Stack .NET Developer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="style1.css" />
+    <style>
+        /* Projects Section Styles */
+        .projects {
+            background: rgba(26, 26, 46, 0.5);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .project-content {
+            padding: 25px;
+        }
+
+        .project-content h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .project-content p {
+            color: #ccc;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .project-link {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .project-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Image Upload Styles */
+        .image-upload-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .image-upload-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .image-upload-container.edit-mode .image-upload-btn {
+            display: flex;
+        }
+
+        .image-upload-input {
+            display: none;
+        }
+
+        /* Project Management Styles */
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .project-actions button {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .edit-project-btn {
+            background: #3498db;
+            color: #fff;
+        }
+
+        .delete-project-btn {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .add-project-btn {
+            display: none;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-project-btn.show {
+            display: block;
+        }
+
+        .add-project-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Project Modal */
+        .project-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2001;
+            overflow-y: auto;
+        }
+
+        .project-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .project-modal-content {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .project-form-group {
+            margin-bottom: 20px;
+        }
+
+        .project-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .project-form-group input,
+        .project-form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .project-form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .project-form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .project-form-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save-project {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: #fff;
+        }
+
+        .btn-cancel-project {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .cv-upload-section {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .cv-upload-section.show {
+            display: block;
+        }
+
+        .cv-upload-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .cv-info {
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <!-- Animated Background -->
@@ -29,22 +292,23 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="nav-icons">
-    <a href="https://www.linkedin.com/in/rayusamajaat" target="_blank"><i class="fab fa-linkedin-in"></i></a>
-    <button class="login-btn" onclick="openLoginModal()">
-        <i class="fas fa-user"></i> Login
-    </button>
-</div>
+                <a href="https://www.linkedin.com/in/rayusamajaat" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                <button class="login-btn" onclick="openLoginModal()">
+                    <i class="fas fa-user"></i> Login
+                </button>
+            </div>
             <div class="menu-btn" onclick="toggleMenu()">
                 <i class="fas fa-bars"></i>
             </div>
         </div>
     </nav>
 
-    <!-- Admin Panel (Hidden by default) -->
+    <!-- Admin Panel -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-header">
             <h3><i class="fas fa-user-shield"></i> Admin Panel</h3>
@@ -56,6 +320,13 @@
         <button class="save-btn" onclick="saveChanges()" style="display: none;">
             <i class="fas fa-save"></i> Save Changes
         </button>
+        <div class="cv-upload-section" id="cvUploadSection">
+            <p class="cv-info"><i class="fas fa-info-circle"></i> Update CV File</p>
+            <input type="file" id="cvFileInput" accept=".pdf" class="image-upload-input">
+            <button class="cv-upload-btn" onclick="document.getElementById('cvFileInput').click()">
+                <i class="fas fa-upload"></i> Upload New CV
+            </button>
+        </div>
     </div>
 
     <!-- Home Section -->
@@ -80,7 +351,13 @@
                 </div>
             </div>
             <div class="profile-image">
-                <img src="bg1.png" alt="Usama Mehboob" id="profileImg">
+                <div class="image-upload-container" id="profileImageContainer">
+                    <img src="bg1.png" alt="Usama Mehboob" id="profileImg">
+                    <button class="image-upload-btn" onclick="document.getElementById('profileImageInput').click()">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="profileImageInput" class="image-upload-input" accept="image/*" onchange="handleImageUpload(event, 'profileImg')">
+                </div>
             </div>
         </div>
     </section>
@@ -93,7 +370,13 @@
             </div>
             <div class="about-content">
                 <div class="about-image">
-                    <img src="Profiletwo.JPG" alt="About">
+                    <div class="image-upload-container" id="aboutImageContainer">
+                        <img src="Profiletwo.JPG" alt="About" id="aboutImg">
+                        <button class="image-upload-btn" onclick="document.getElementById('aboutImageInput').click()">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="file" id="aboutImageInput" class="image-upload-input" accept="image/*" onchange="handleImageUpload(event, 'aboutImg')">
+                    </div>
                 </div>
                 <div class="about-text">
                     <h3 contenteditable="false" data-field="about-title">Development Is My Passion</h3>
@@ -179,6 +462,21 @@
         </div>
     </section>
 
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+        <div class="content-wrapper">
+            <div class="section-title">
+                <h2>My Projects</h2>
+            </div>
+            <div class="projects-grid" id="projectsGrid">
+                <!-- Projects will be dynamically loaded here -->
+            </div>
+            <button class="add-project-btn" id="addProjectBtn" onclick="openProjectModal()">
+                <i class="fas fa-plus"></i> Add New Project
+            </button>
+        </div>
+    </section>
+
     <!-- Services Section -->
     <section class="services" id="services">
         <div class="content-wrapper">
@@ -251,8 +549,8 @@
 
     <!-- Footer -->
     <footer>
-    <p>Created By <a href="#">Usama Mehboob</a> | &copy; <span id="currentYear"></span> All Rights Reserved | <span id="currentDateTime"></span></p>
-</footer>
+        <p>Created By <a href="#">Usama Mehboob</a> | &copy; <span id="currentYear"></span> All Rights Reserved | <span id="currentDateTime"></span></p>
+    </footer>
 
     <!-- Login Modal -->
     <div class="modal" id="loginModal">
@@ -274,6 +572,43 @@
                 <button type="submit" class="btn btn-primary" style="width: 100%;">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div class="project-modal" id="projectModal">
+        <div class="project-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-project-diagram"></i> <span id="projectModalTitle">Add Project</span></h2>
+                <button class="close-btn" onclick="closeProjectModal()">&times;</button>
+            </div>
+            <form id="projectForm" onsubmit="handleProjectSubmit(event)">
+                <div class="project-form-group">
+                    <label for="projectTitle"><i class="fas fa-heading"></i> Project Title</label>
+                    <input type="text" id="projectTitle" placeholder="Enter project title" required>
+                </div>
+                <div class="project-form-group">
+                    <label for="projectDescription"><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="projectDescription" placeholder="Enter project description" required></textarea>
+                </div>
+                <div class="project-form-group">
+                    <label for="projectLink"><i class="fas fa-link"></i> Project Link</label>
+                    <input type="url" id="projectLink" placeholder="https://example.com" required>
+                </div>
+                <div class="project-form-group">
+                    <label for="projectImage"><i class="fas fa-image"></i> Project Image URL</label>
+                    <input type="text" id="projectImage" placeholder="Enter image URL or upload below">
+                    <input type="file" id="projectImageUpload" accept="image/*" style="margin-top: 10px;" onchange="handleProjectImageUpload(event)">
+                </div>
+                <div class="project-form-actions">
+                    <button type="submit" class="btn-save-project">
+                        <i class="fas fa-save"></i> Save Project
+                    </button>
+                    <button type="button" class="btn-cancel-project" onclick="closeProjectModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
             </form>
         </div>
     </div>
