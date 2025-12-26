@@ -262,7 +262,7 @@ function hireMeAction() {
 
 // Download CV
 function downloadCV() {
-    const cvUrl = "https://github.com/aliusa557/usama/raw/main/CV.UsamaMehboob.pdf";
+    const cvUrl = "https://github.com/aliusa557/usama1/raw/main/CV.UsamaMehboob.pdf";
     
     const link = document.createElement('a');
     link.href = cvUrl;
