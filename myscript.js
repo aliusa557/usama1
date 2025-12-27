@@ -251,7 +251,7 @@ function disableEdit() {
     }
 }
 
-// Save changes
+// Save changes to PHP backend
 async function saveChanges() {
     const editableElements = document.querySelectorAll('[data-field]');
     
@@ -265,21 +265,35 @@ async function saveChanges() {
     contentData.aboutImage = document.getElementById('aboutImg').src;
     
     try {
-        await window.storage.set('portfolio-content', JSON.stringify(contentData), true);
-        disableEdit();
-        showSuccessMessage('Changes saved successfully!');
+        const response = await fetch('save_data.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=save_content&content=${encodeURIComponent(JSON.stringify(contentData))}`
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            disableEdit();
+            showSuccessMessage('Changes saved successfully!');
+        } else {
+            showSuccessMessage('Error saving changes. Please try again.');
+        }
     } catch (error) {
         console.error('Error saving content:', error);
         showSuccessMessage('Error saving changes. Please try again.');
     }
 }
 
-// Load stored content
+// Load stored content from PHP backend
 async function loadStoredContent() {
     try {
-        const result = await window.storage.get('portfolio-content', true);
-        if (result && result.value) {
-            contentData = JSON.parse(result.value);
+        const response = await fetch('save_data.php?action=load_content');
+        const data = await response.json();
+        
+        if (data && Object.keys(data).length > 0) {
+            contentData = data;
             
             Object.keys(contentData).forEach(fieldName => {
                 const element = document.querySelector(`[data-field="${fieldName}"]`);
@@ -322,8 +336,20 @@ document.getElementById('cvFileInput').addEventListener('change', async function
         reader.onload = async function(e) {
             cvFileData = e.target.result;
             try {
-                await window.storage.set('portfolio-cv', cvFileData, true);
-                showSuccessMessage('CV uploaded successfully!');
+                const response = await fetch('save_data.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=save_cv&cvData=${encodeURIComponent(cvFileData)}`
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showSuccessMessage('CV uploaded successfully!');
+                } else {
+                    showSuccessMessage('Error uploading CV. Please try again.');
+                }
             } catch (error) {
                 console.error('Error uploading CV:', error);
                 showSuccessMessage('Error uploading CV. Please try again.');
@@ -338,12 +364,13 @@ document.getElementById('cvFileInput').addEventListener('change', async function
 // Download CV
 async function downloadCV() {
     try {
-        const result = await window.storage.get('portfolio-cv', true);
+        const response = await fetch('save_data.php?action=load_cv');
+        const data = await response.json();
         
-        if (result && result.value) {
+        if (data.cv) {
             // Download uploaded CV
             const link = document.createElement('a');
-            link.href = result.value;
+            link.href = data.cv;
             link.download = "CV.UsamaMehboob.pdf";
             document.body.appendChild(link);
             link.click();
@@ -374,16 +401,12 @@ async function downloadCV() {
 
 // PROJECT MANAGEMENT FUNCTIONS
 
-// Load projects from shared storage
+// Load projects from PHP backend
 async function loadProjects() {
     try {
-        const result = await window.storage.get('projects-data', true);
-        if (result && result.value) {
-            projects = JSON.parse(result.value);
-        } else {
-            // No projects found - start with empty array
-            projects = [];
-        }
+        const response = await fetch('save_data.php?action=load_projects');
+        const data = await response.json();
+        projects = Array.isArray(data) ? data : [];
     } catch (error) {
         console.log('No projects found, starting fresh');
         projects = [];
@@ -391,11 +414,19 @@ async function loadProjects() {
     renderProjects();
 }
 
-// Save all projects to shared storage
+// Save all projects to PHP backend
 async function saveProjects() {
     try {
-        await window.storage.set('projects-data', JSON.stringify(projects), true);
-        return true;
+        const response = await fetch('save_data.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=save_projects&projects=${encodeURIComponent(JSON.stringify(projects))}`
+        });
+        
+        const result = await response.json();
+        return result.success;
     } catch (error) {
         console.error('Error saving projects:', error);
         showSuccessMessage('Error saving projects. Please try again.');
