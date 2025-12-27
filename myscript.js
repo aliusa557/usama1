@@ -14,7 +14,7 @@ let cvFileData = null;
 const firebaseConfig = {
     apiKey: "AIzaSyDscnO3SUGt1W_XRwdYlUyN8T-cA_ghHgg",
     authDomain: "usama-portfolio-70ea5.firebaseapp.com",
-    databaseURL: "https://usama-portfolio-70ea5-default-rtdb.firebaseio.com",
+    databaseURL: "https://usama-portfolio-70ea5-default-rtdb.asia-southeast1.firebasedatabase.app/",
     projectId: "usama-portfolio-70ea5",
     storageBucket: "usama-portfolio-70ea5.firebasestorage.app",
     messagingSenderId: "611719809684",
