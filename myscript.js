@@ -252,7 +252,7 @@ function disableEdit() {
 }
 
 // Save changes
-function saveChanges() {
+async function saveChanges() {
     const editableElements = document.querySelectorAll('[data-field]');
     
     editableElements.forEach(element => {
@@ -264,32 +264,40 @@ function saveChanges() {
     contentData.profileImage = document.getElementById('profileImg').src;
     contentData.aboutImage = document.getElementById('aboutImg').src;
     
-    localStorage.setItem('portfolioContent', JSON.stringify(contentData));
-    
-    disableEdit();
-    showSuccessMessage('Changes saved successfully!');
+    try {
+        await window.storage.set('portfolio-content', JSON.stringify(contentData), true);
+        disableEdit();
+        showSuccessMessage('Changes saved successfully!');
+    } catch (error) {
+        console.error('Error saving content:', error);
+        showSuccessMessage('Error saving changes. Please try again.');
+    }
 }
 
 // Load stored content
-function loadStoredContent() {
-    const stored = localStorage.getItem('portfolioContent');
-    if (stored) {
-        contentData = JSON.parse(stored);
-        
-        Object.keys(contentData).forEach(fieldName => {
-            const element = document.querySelector(`[data-field="${fieldName}"]`);
-            if (element) {
-                element.textContent = contentData[fieldName];
+async function loadStoredContent() {
+    try {
+        const result = await window.storage.get('portfolio-content', true);
+        if (result && result.value) {
+            contentData = JSON.parse(result.value);
+            
+            Object.keys(contentData).forEach(fieldName => {
+                const element = document.querySelector(`[data-field="${fieldName}"]`);
+                if (element) {
+                    element.textContent = contentData[fieldName];
+                }
+            });
+            
+            // Load images
+            if (contentData.profileImage) {
+                document.getElementById('profileImg').src = contentData.profileImage;
             }
-        });
-        
-        // Load images
-        if (contentData.profileImage) {
-            document.getElementById('profileImg').src = contentData.profileImage;
+            if (contentData.aboutImage) {
+                document.getElementById('aboutImg').src = contentData.aboutImage;
+            }
         }
-        if (contentData.aboutImage) {
-            document.getElementById('aboutImg').src = contentData.aboutImage;
-        }
+    } catch (error) {
+        console.log('No stored content found, using defaults');
     }
 }
 
@@ -307,14 +315,19 @@ function handleImageUpload(event, imgId) {
 }
 
 // Handle CV file upload
-document.getElementById('cvFileInput').addEventListener('change', function(event) {
+document.getElementById('cvFileInput').addEventListener('change', async function(event) {
     const file = event.target.files[0];
     if (file && file.type === 'application/pdf') {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             cvFileData = e.target.result;
-            localStorage.setItem('cvFile', cvFileData);
-            showSuccessMessage('CV uploaded successfully!');
+            try {
+                await window.storage.set('portfolio-cv', cvFileData, true);
+                showSuccessMessage('CV uploaded successfully!');
+            } catch (error) {
+                console.error('Error uploading CV:', error);
+                showSuccessMessage('Error uploading CV. Please try again.');
+            }
         };
         reader.readAsDataURL(file);
     } else {
@@ -323,19 +336,31 @@ document.getElementById('cvFileInput').addEventListener('change', function(event
 });
 
 // Download CV
-function downloadCV() {
-    const storedCV = localStorage.getItem('cvFile');
-    
-    if (storedCV) {
-        // Download uploaded CV
-        const link = document.createElement('a');
-        link.href = storedCV;
-        link.download = "CV.UsamaMehboob.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } else {
-        // Download default CV
+async function downloadCV() {
+    try {
+        const result = await window.storage.get('portfolio-cv', true);
+        
+        if (result && result.value) {
+            // Download uploaded CV
+            const link = document.createElement('a');
+            link.href = result.value;
+            link.download = "CV.UsamaMehboob.pdf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            // Download default CV
+            const cvUrl = "https://github.com/aliusa557/usama1/raw/main/CV.UsamaMehboob.pdf";
+            const link = document.createElement('a');
+            link.href = cvUrl;
+            link.download = "CV.UsamaMehboob.pdf";
+            link.target = "_blank";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    } catch (error) {
+        // Download default CV if error
         const cvUrl = "https://github.com/aliusa557/usama1/raw/main/CV.UsamaMehboob.pdf";
         const link = document.createElement('a');
         link.href = cvUrl;
@@ -348,7 +373,7 @@ function downloadCV() {
 }
 
 // PROJECT MANAGEMENT FUNCTIONS
-// Load projects from shared storage
+
 // Load projects from shared storage
 async function loadProjects() {
     try {
@@ -441,7 +466,7 @@ function handleProjectImageUpload(event) {
 }
 
 // Handle project form submit
-function handleProjectSubmit(event) {
+async function handleProjectSubmit(event) {
     event.preventDefault();
     
     const title = document.getElementById('projectTitle').value;
@@ -460,7 +485,6 @@ function handleProjectSubmit(event) {
                 link,
                 image
             };
-            showSuccessMessage('Project updated successfully!');
         }
     } else {
         // Add new project
@@ -472,12 +496,14 @@ function handleProjectSubmit(event) {
             image
         };
         projects.push(newProject);
-        showSuccessMessage('Project added successfully!');
     }
     
-    saveProjects();
-    renderProjects();
-    closeProjectModal();
+    const saved = await saveProjects();
+    if (saved) {
+        showSuccessMessage(currentEditProjectId ? 'Project updated successfully!' : 'Project added successfully!');
+        renderProjects();
+        closeProjectModal();
+    }
 }
 
 // Edit project
@@ -495,12 +521,14 @@ function editProject(id) {
 }
 
 // Delete project
-function deleteProject(id) {
+async function deleteProject(id) {
     if (confirm('Are you sure you want to delete this project?')) {
         projects = projects.filter(p => p.id !== id);
-        saveProjects();
-        renderProjects();
-        showSuccessMessage('Project deleted successfully!');
+        const saved = await saveProjects();
+        if (saved) {
+            renderProjects();
+            showSuccessMessage('Project deleted successfully!');
+        }
     }
 }
 
