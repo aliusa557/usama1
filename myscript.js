@@ -10,8 +10,28 @@ let projects = [];
 let currentEditProjectId = null;
 let cvFileData = null;
 
+// Firebase configuration - YOU NEED TO REPLACE THESE WITH YOUR OWN
+const firebaseConfig = {
+    apiKey: "AIzaSyDscnO3SUGt1W_XRwdYlUyN8T-cA_ghHgg",
+    authDomain: "usama-portfolio-70ea5.firebaseapp.com",
+    databaseURL: "https://usama-portfolio-70ea5-default-rtdb.firebaseio.com",
+    projectId: "usama-portfolio-70ea5",
+    storageBucket: "usama-portfolio-70ea5.firebasestorage.app",
+    messagingSenderId: "611719809684",
+    appId: "1:611719809684:web:8b72f31de30615d0758281"
+};
+
+// Initialize Firebase
+let db;
+let storage;
+
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", function() {
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    storage = firebase.storage();
+    
     createParticles();
     initScrollEffects();
     loadStoredContent();
@@ -251,7 +271,7 @@ function disableEdit() {
     }
 }
 
-// Save changes to PHP backend
+// Save changes to Firebase
 async function saveChanges() {
     const editableElements = document.querySelectorAll('[data-field]');
     
@@ -265,34 +285,22 @@ async function saveChanges() {
     contentData.aboutImage = document.getElementById('aboutImg').src;
     
     try {
-        const response = await fetch('save_data.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `action=save_content&content=${encodeURIComponent(JSON.stringify(contentData))}`
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-            disableEdit();
-            showSuccessMessage('Changes saved successfully!');
-        } else {
-            showSuccessMessage('Error saving changes. Please try again.');
-        }
+        await db.ref('portfolio-content').set(contentData);
+        disableEdit();
+        showSuccessMessage('Changes saved successfully!');
     } catch (error) {
         console.error('Error saving content:', error);
         showSuccessMessage('Error saving changes. Please try again.');
     }
 }
 
-// Load stored content from PHP backend
+// Load stored content from Firebase
 async function loadStoredContent() {
     try {
-        const response = await fetch('save_data.php?action=load_content');
-        const data = await response.json();
+        const snapshot = await db.ref('portfolio-content').once('value');
+        const data = snapshot.val();
         
-        if (data && Object.keys(data).length > 0) {
+        if (data) {
             contentData = data;
             
             Object.keys(contentData).forEach(fieldName => {
@@ -336,20 +344,8 @@ document.getElementById('cvFileInput').addEventListener('change', async function
         reader.onload = async function(e) {
             cvFileData = e.target.result;
             try {
-                const response = await fetch('save_data.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=save_cv&cvData=${encodeURIComponent(cvFileData)}`
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    showSuccessMessage('CV uploaded successfully!');
-                } else {
-                    showSuccessMessage('Error uploading CV. Please try again.');
-                }
+                await db.ref('portfolio-cv').set(cvFileData);
+                showSuccessMessage('CV uploaded successfully!');
             } catch (error) {
                 console.error('Error uploading CV:', error);
                 showSuccessMessage('Error uploading CV. Please try again.');
@@ -364,13 +360,13 @@ document.getElementById('cvFileInput').addEventListener('change', async function
 // Download CV
 async function downloadCV() {
     try {
-        const response = await fetch('save_data.php?action=load_cv');
-        const data = await response.json();
+        const snapshot = await db.ref('portfolio-cv').once('value');
+        const cvData = snapshot.val();
         
-        if (data.cv) {
+        if (cvData) {
             // Download uploaded CV
             const link = document.createElement('a');
-            link.href = data.cv;
+            link.href = cvData;
             link.download = "CV.UsamaMehboob.pdf";
             document.body.appendChild(link);
             link.click();
@@ -401,32 +397,28 @@ async function downloadCV() {
 
 // PROJECT MANAGEMENT FUNCTIONS
 
-// Load projects from PHP backend
-async function loadProjects() {
-    try {
-        const response = await fetch('save_data.php?action=load_projects');
-        const data = await response.json();
-        projects = Array.isArray(data) ? data : [];
-    } catch (error) {
-        console.log('No projects found, starting fresh');
-        projects = [];
-    }
-    renderProjects();
+// Load projects from Firebase (real-time updates)
+function loadProjects() {
+    db.ref('projects').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            projects = Object.values(data);
+        } else {
+            projects = [];
+        }
+        renderProjects();
+    });
 }
 
-// Save all projects to PHP backend
+// Save all projects to Firebase
 async function saveProjects() {
     try {
-        const response = await fetch('save_data.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `action=save_projects&projects=${encodeURIComponent(JSON.stringify(projects))}`
+        const projectsObj = {};
+        projects.forEach(project => {
+            projectsObj[project.id] = project;
         });
-        
-        const result = await response.json();
-        return result.success;
+        await db.ref('projects').set(projectsObj);
+        return true;
     } catch (error) {
         console.error('Error saving projects:', error);
         showSuccessMessage('Error saving projects. Please try again.');
@@ -532,7 +524,6 @@ async function handleProjectSubmit(event) {
     const saved = await saveProjects();
     if (saved) {
         showSuccessMessage(currentEditProjectId ? 'Project updated successfully!' : 'Project added successfully!');
-        renderProjects();
         closeProjectModal();
     }
 }
@@ -557,7 +548,6 @@ async function deleteProject(id) {
         projects = projects.filter(p => p.id !== id);
         const saved = await saveProjects();
         if (saved) {
-            renderProjects();
             showSuccessMessage('Project deleted successfully!');
         }
     }
