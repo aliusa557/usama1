@@ -348,60 +348,28 @@ function downloadCV() {
 }
 
 // PROJECT MANAGEMENT FUNCTIONS
-
-// Load projects from localStorage
+// Load projects from shared storage
 // Load projects from shared storage
 async function loadProjects() {
     try {
-        const result = await window.storage.get('portfolio-projects', true);
+        const result = await window.storage.get('projects-data', true);
         if (result && result.value) {
             projects = JSON.parse(result.value);
         } else {
-            // Default projects
-            projects = [
-                {
-                    id: 1,
-                    title: "E-Commerce Platform",
-                    description: "Full-stack e-commerce solution built with ASP.NET Core and React",
-                    link: "https://github.com",
-                    image: "https://via.placeholder.com/400x250/667eea/ffffff?text=E-Commerce"
-                },
-                {
-                    id: 2,
-                    title: "Task Management System",
-                    description: "Modern task management application with real-time updates",
-                    link: "https://github.com",
-                    image: "https://via.placeholder.com/400x250/764ba2/ffffff?text=Task+Manager"
-                }
-            ];
-            await saveProjects();
+            // No projects found - start with empty array
+            projects = [];
         }
     } catch (error) {
-        console.log('Loading default projects');
-        projects = [
-            {
-                id: 1,
-                title: "E-Commerce Platform",
-                description: "Full-stack e-commerce solution built with ASP.NET Core and React",
-                link: "https://github.com",
-                image: "https://via.placeholder.com/400x250/667eea/ffffff?text=E-Commerce"
-            },
-            {
-                id: 2,
-                title: "Task Management System",
-                description: "Modern task management application with real-time updates",
-                link: "https://github.com",
-                image: "https://via.placeholder.com/400x250/764ba2/ffffff?text=Task+Manager"
-            }
-        ];
+        console.log('No projects found, starting fresh');
+        projects = [];
     }
     renderProjects();
 }
 
-// Save projects to shared storage
+// Save all projects to shared storage
 async function saveProjects() {
     try {
-        await window.storage.set('portfolio-projects', JSON.stringify(projects), true);
+        await window.storage.set('projects-data', JSON.stringify(projects), true);
         return true;
     } catch (error) {
         console.error('Error saving projects:', error);
