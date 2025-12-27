@@ -350,12 +350,34 @@ function downloadCV() {
 // PROJECT MANAGEMENT FUNCTIONS
 
 // Load projects from localStorage
-function loadProjects() {
-    const stored = localStorage.getItem('projects');
-    if (stored) {
-        projects = JSON.parse(stored);
-    } else {
-        // Default projects
+// Load projects from shared storage
+async function loadProjects() {
+    try {
+        const result = await window.storage.get('portfolio-projects', true);
+        if (result && result.value) {
+            projects = JSON.parse(result.value);
+        } else {
+            // Default projects
+            projects = [
+                {
+                    id: 1,
+                    title: "E-Commerce Platform",
+                    description: "Full-stack e-commerce solution built with ASP.NET Core and React",
+                    link: "https://github.com",
+                    image: "https://via.placeholder.com/400x250/667eea/ffffff?text=E-Commerce"
+                },
+                {
+                    id: 2,
+                    title: "Task Management System",
+                    description: "Modern task management application with real-time updates",
+                    link: "https://github.com",
+                    image: "https://via.placeholder.com/400x250/764ba2/ffffff?text=Task+Manager"
+                }
+            ];
+            await saveProjects();
+        }
+    } catch (error) {
+        console.log('Loading default projects');
         projects = [
             {
                 id: 1,
@@ -372,14 +394,20 @@ function loadProjects() {
                 image: "https://via.placeholder.com/400x250/764ba2/ffffff?text=Task+Manager"
             }
         ];
-        saveProjects();
     }
     renderProjects();
 }
 
-// Save projects to localStorage
-function saveProjects() {
-    localStorage.setItem('projects', JSON.stringify(projects));
+// Save projects to shared storage
+async function saveProjects() {
+    try {
+        await window.storage.set('portfolio-projects', JSON.stringify(projects), true);
+        return true;
+    } catch (error) {
+        console.error('Error saving projects:', error);
+        showSuccessMessage('Error saving projects. Please try again.');
+        return false;
+    }
 }
 
 // Render projects
